@@ -28,7 +28,7 @@ def open_github(url_path):
 def get_repositories(force_reload=False):
     repo_file = ReposCacheFile()
     repos = repo_file.read()
-    config = GithubConfig.from_file()
+    config = GithubConfig()
 
     api = GitHubApi(config.organization, config.token)
     if force_reload:
