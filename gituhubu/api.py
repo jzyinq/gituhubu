@@ -1,5 +1,6 @@
 import concurrent.futures
 import json
+import os
 import re
 
 import requests
@@ -8,27 +9,27 @@ from gituhubu.local_storage import ConfigFile
 
 
 class GithubConfig:
-    def __init__(self, organization, token):
-        self.organization = organization
-        self.token = token
-
-    @staticmethod
-    def from_file():
+    def __init__(self):
         config_file = ConfigFile()
         config = config_file.read()
+
         try:
-            return GithubConfig(config['organization'], config['token'])
+            self.organization = os.getenv("GITHUB_ORGANIZATION") \
+                if os.getenv("GITHUB_ORGANIZATION") else config['organization']
+            self.token = os.getenv("GITHUB_TOKEN") \
+                if os.getenv("GITHUB_TOKEN") else config['token']
         except KeyError:
             raise RuntimeError(f"""Missing configuration in config.json.
 Please create file '{config_file.file_path}' with following content:
 ```
 {{
-  "organization": "ORGANIZATION_NAME",
-  "token": "API_TOKEN"
+  "organization": "GITHUB_ORGANIZATION",
+  "token": "GITHUB_TOKEN"
 }}
 ```
-ORGANIZATION_NAME is organization you want to search 
-API_TOKEN is a github personal access token with minimum scope of `repos`.
+or you can export env variables:
+GITHUB_ORGANIZATION as organization you want to search 
+GITHUB_TOKEN as a github personal access token with minimum scope of `repos`.
 More details here: 
 https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token
 """)

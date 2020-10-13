@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="gituhubu",
-    version="0.1.1",
+    version="0.2.0",
     author="Jaroslaw Zywert",
     author_email="zywert@gmail.com",
     description="CLI tool for searching github organization repositories using fzf",

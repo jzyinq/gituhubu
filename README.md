@@ -24,6 +24,12 @@ Example configuration:
 }
 ```
 
+You can also use environment variables as a alternative:
+```
+GITHUB_ORGANIZATION=ORGANIZATION_NAME
+GITHUB_TOKEN=API_TOKEN
+```
+
 Where ORGANIZATION_NAME is a github organization you want to search and API_TOKEN is a github personal access token with minimum scope of `repos`.
 
 More details about creating such token you can find in [github docs](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token). 
@@ -34,7 +40,6 @@ More details about creating such token you can find in [github docs](https://doc
 ```
 gituhubu
 ``` 
-
 to invoke search list. Type any part of repository name you'll searching for and hit enter to select it.
 
 After selection you will get a short details about repo and possible actions:

@@ -12,7 +12,7 @@ class CLI:
     def main(repos):
         selected_repo = get_fuzzy_search(repos)
         if selected_repo:
-            github_config = GithubConfig.from_file()
+            github_config = GithubConfig()
             repo_details = GitHubApi(github_config.organization, github_config.token).get_repo_details(
                 selected_repo)
             print(f"{selected_repo} - last update: {repo_details['updated_at']}")
