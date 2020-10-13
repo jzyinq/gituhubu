@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+import argparse
+
+import getch
+
+from gituhubu.api import GitHubApi, GithubConfig
+from gituhubu.utils import clone_repository, get_fuzzy_search, get_repositories, open_github
+
+
+class CLI:
+    @staticmethod
+    def main(repos):
+        selected_repo = get_fuzzy_search(repos)
+        if selected_repo:
+            github_config = GithubConfig.from_file()
+            repo_details = GitHubApi(github_config.organization, github_config.token).get_repo_details(
+                selected_repo)
+            print(f"{selected_repo} - last update: {repo_details['updated_at']}")
+            print(f"Actions: \n"
+                  f"- (o)pen in browser\n"
+                  f"- (c)lone\n"
+                  f"- view c(h)angelog")
+            chosen_option = getch.getch()
+            if chosen_option == 'c':
+                clone_repository(repos[selected_repo]['ssh_url'])
+            if chosen_option == 'o':
+                open_github(repos[selected_repo]['full_name'])
+                print(f'Opening {selected_repo} on github ...')
+            if chosen_option == 'h':
+                open_github(f"{repos[selected_repo]['full_name']}/blob/master/CHANGELOG.md")
+
+    @staticmethod
+    def rofi_mode(repos, rofi):
+        if rofi is not None:
+            try:
+                open_github(repos[rofi]['full_name'])
+            except KeyError:
+                print(f"There is no repository called '{rofi}'")
+        else:
+            print("""\x00prompt\x1fgituhubu""")
+            for repo in repos:
+                print(f"{repo}\0")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-u', '--update', action='store_true', help="update repository cache")
+    group.add_argument("-r", "--rofi", nargs="?", default=False,
+                       help="rofi compatible mode - use `rofi -modi gituhubu:\"gituhubu -r\" -show gituhubu`")
+    args = parser.parse_args()
+
+    try:
+        repos = get_repositories(args.update)
+        if args.rofi is not False:
+            CLI.rofi_mode(repos, args.rofi)
+        else:
+            CLI.main(repos)
+    except RuntimeError as e:
+        print(e)
